@@ -6,4 +6,8 @@ kubectl patch deployment argocd-server -n argocd --type='json' -p='[{"op": "add"
 kubectl apply -f infrastructure/argocd/ingress.yaml
 kubectl apply -f argocd/apps.yaml
 echo "Done! ArgoCD: http://argocd.localhost"
+echo "Waiting for admin secret..."
+until kubectl -n argocd get secret argocd-initial-admin-secret &>/dev/null; do
+  sleep 2
+done
 echo "Password: $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d)"
