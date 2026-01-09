@@ -1,0 +1,11 @@
+# Editor
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+
+# Secrets (niemals committen!)
+*-secret.yaml
+secrets/
