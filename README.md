@@ -2,6 +2,21 @@
 
 A GitOps-based Kubernetes learning environment using ArgoCD and Kustomize.
 
+## Prerequisites
+
+| Tool | Required |
+|------|----------|
+| Docker | Yes |
+| k3d | Yes |
+| kubectl | Yes |
+
+**Platform Support:**
+- macOS: Full support
+- Linux: Full support
+- Windows: Requires WSL2
+
+**Note:** Port 80 must be available (no other webserver running).
+
 ## Quick Start
 
 ```bash
