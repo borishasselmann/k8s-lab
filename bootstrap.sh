@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e  # Exit on error
 
-# Install ArgoCD
-kubectl apply -f infrastructure/argocd/namespace.yaml
-kubectl apply -n argocd -f infrastructure/argocd/install.yaml
+# Install ArgoCD (latest stable version)
+kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 # Wait for deployment to be created
 echo "Waiting for ArgoCD deployment to be created..."
