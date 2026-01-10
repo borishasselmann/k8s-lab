@@ -97,6 +97,9 @@ data:
         relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
+          # Add metrics_path label required by kube-prometheus dashboards
+          - target_label: metrics_path
+            replacement: /metrics
 
       # node-exporter
       - job_name: 'node-exporter'
