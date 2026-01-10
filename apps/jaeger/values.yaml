@@ -1,57 +1,73 @@
-# Jaeger Distributed Tracing
+# Jaeger v2 with OpenTelemetry Collector
 # Chart: https://github.com/jaegertracing/helm-charts/tree/main/charts/jaeger
 
-# Use Elasticsearch as storage backend
+# Jaeger v2 uses OTEL Collector config format
+config:
+  extensions:
+    jaeger_storage:
+      backends:
+        primary_store:
+          elasticsearch:
+            server_urls: ["http://elasticsearch.logging.svc.cluster.local:9200"]
+        archive_store:
+          elasticsearch:
+            server_urls: ["http://elasticsearch.logging.svc.cluster.local:9200"]
+    jaeger_query:
+      storage:
+        traces: primary_store
+        traces_archive: archive_store
+    healthcheckv2:
+      use_v2: true
+      http:
+        endpoint: 0.0.0.0:13133
+  service:
+    extensions: [jaeger_storage, jaeger_query, healthcheckv2]
+    pipelines:
+      traces:
+        receivers: [otlp, jaeger, zipkin]
+        processors: [batch]
+        exporters: [jaeger_storage_exporter]
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+    jaeger:
+      protocols:
+        grpc:
+    zipkin:
+  processors:
+    batch:
+  exporters:
+    jaeger_storage_exporter:
+      trace_storage: primary_store
+
+# Don't provision datastores - we use external ES
 provisionDataStore:
   cassandra: false
-  elasticsearch: false  # We use external ES
-  kafka: false
+  elasticsearch: false
 
-storage:
-  type: elasticsearch
-  elasticsearch:
-    host: elasticsearch.logging.svc.cluster.local
-    port: 9200
-    scheme: http
-    anonymous: true
-
-# Collector - receives traces from applications
-collector:
+# Jaeger deployment settings
+jaeger:
   enabled: true
-  resources:
-    requests:
-      cpu: "50m"
-      memory: "128Mi"
-    limits:
-      cpu: "200m"
-      memory: "256Mi"
-
-# Query - UI and API for searching traces
-query:
-  enabled: true
-  resources:
-    requests:
-      cpu: "50m"
-      memory: "128Mi"
-    limits:
-      cpu: "200m"
-      memory: "256Mi"
+  replicas: 1
   ingress:
     enabled: true
     ingressClassName: traefik
     hosts:
       - jaeger.localhost
 
-# Agent - sidecar/daemonset for collecting traces (optional)
-agent:
-  enabled: true
-
-# Spark dependencies job (optional - for dependency graph)
-spark:
+# Disable maintenance jobs (esIndexCleaner needs different config in v2)
+esIndexCleaner:
   enabled: false
 
-# Elasticsearch index cleaner (cleanup old traces)
-esIndexCleaner:
-  enabled: true
-  schedule: "55 23 * * *"
-  numberOfDays: 7
+esRollover:
+  enabled: false
+
+esLookback:
+  enabled: false
+
+spark:
+  enabled: false
