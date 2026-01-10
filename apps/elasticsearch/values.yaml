@@ -2,10 +2,12 @@
 # Chart: https://github.com/bitnami/charts/tree/main/bitnami/elasticsearch
 
 # Use bitnamilegacy images (Bitnami moved to paid registry Aug 2025)
-global:
-  imageRegistry: docker.io/bitnamilegacy
+image:
+  registry: docker.io
+  repository: bitnamilegacy/elasticsearch
+  tag: 9.1.2-debian-12-r0
 
-# Disable init containers that use os-shell
+# Disable init containers that cause image pull issues
 volumePermissions:
   enabled: false
 sysctlImage:
