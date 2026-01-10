@@ -1,0 +1,40 @@
+# Bitnami Elasticsearch Single Node for k3d
+# Chart: https://github.com/bitnami/charts/tree/main/bitnami/elasticsearch
+
+# Single master node (no data/coordinating separation)
+master:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"
+  persistence:
+    enabled: false
+  heapSize: 1024m
+
+# Disable other node types for single-node setup
+data:
+  replicaCount: 0
+coordinating:
+  replicaCount: 0
+ingest:
+  replicaCount: 0
+
+# Security disabled for local dev
+security:
+  enabled: false
+  tls:
+    restEncryption: false
+
+# Ingress
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hostname: elasticsearch.localhost
+
+# Metrics for Prometheus (optional)
+metrics:
+  enabled: false

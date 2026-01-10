@@ -1,0 +1,57 @@
+# Jaeger Distributed Tracing
+# Chart: https://github.com/jaegertracing/helm-charts/tree/main/charts/jaeger
+
+# Use Elasticsearch as storage backend
+provisionDataStore:
+  cassandra: false
+  elasticsearch: false  # We use external ES
+  kafka: false
+
+storage:
+  type: elasticsearch
+  elasticsearch:
+    host: elasticsearch.logging.svc.cluster.local
+    port: 9200
+    scheme: http
+    anonymous: true
+
+# Collector - receives traces from applications
+collector:
+  enabled: true
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+
+# Query - UI and API for searching traces
+query:
+  enabled: true
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - jaeger.localhost
+
+# Agent - sidecar/daemonset for collecting traces (optional)
+agent:
+  enabled: true
+
+# Spark dependencies job (optional - for dependency graph)
+spark:
+  enabled: false
+
+# Elasticsearch index cleaner (cleanup old traces)
+esIndexCleaner:
+  enabled: true
+  schedule: "55 23 * * *"
+  numberOfDays: 7
