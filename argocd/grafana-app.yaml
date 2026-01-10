@@ -18,4 +18,5 @@ spec:
       selfHeal: true
     syncOptions:
     - CreateNamespace=true
-    - ServerSideApply=true
+    # ServerSideApply required if Dashboard ConfigMaps exceed the 262KB annotation size limit
+    # - ServerSideApply=true

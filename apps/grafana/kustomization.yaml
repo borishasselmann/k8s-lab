@@ -11,12 +11,12 @@ resources:
 namespace: monitoring
 
 # Generate ConfigMap from official Grafana community dashboards
-# - Node Exporter Full (ID: 1860) - https://grafana.com/grafana/dashboards/1860
+# - K8s Node Metrics (ID: 22413) - https://grafana.com/grafana/dashboards/22413 (Grafana 11, 2025)
 # - Kubernetes Cluster (ID: 7249) - https://grafana.com/grafana/dashboards/7249
 configMapGenerator:
   - name: grafana-dashboards
     files:
       - dashboards/kubernetes-cluster.json
-      - dashboards/node-exporter-full.json
+      - dashboards/node-exporter.json
     options:
       disableNameSuffixHash: true
