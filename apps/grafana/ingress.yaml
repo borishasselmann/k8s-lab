@@ -4,6 +4,7 @@ metadata:
   name: grafana
   namespace: monitoring
 spec:
+  ingressClassName: traefik
   rules:
   - host: grafana.localhost
     http:

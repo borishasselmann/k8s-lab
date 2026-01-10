@@ -1,25 +1,15 @@
 #!/bin/bash
 set -e  # Exit on error
 
-# Install ArgoCD (latest stable version)
+# Install ArgoCD with Kustomize (includes --insecure patch and ingress)
 kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl apply -k infrastructure/argocd/
 
-# Wait for deployment to be created
-echo "Waiting for ArgoCD deployment to be created..."
-until kubectl -n argocd get deployment argocd-server &>/dev/null; do
-  sleep 2
-done
-
-# Patch before first rollout completes to avoid double restart
-kubectl patch deployment argocd-server -n argocd --type='json' \
-  -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--insecure"}]'
-
-# Wait for patched deployment to be ready
+# Wait for deployment to be ready
+echo "Waiting for ArgoCD deployment..."
 kubectl rollout status deployment/argocd-server -n argocd --timeout=300s
 
-# Apply ingress and apps
-kubectl apply -f infrastructure/argocd/ingress.yaml
+# Apply apps
 kubectl apply -f argocd/apps.yaml
 
 # Wait for admin secret to be generated
