@@ -33,28 +33,28 @@ k3d cluster create dev -p "80:80@loadbalancer"
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        Git Repository                        │
+│                        Git Repository                       │
 ├─────────────────────────────────────────────────────────────┤
-│  argocd/                    │  infrastructure/argocd/        │
-│  ├── apps.yaml (App of Apps)│  ├── kustomization.yaml        │
-│  ├── argocd-app.yaml        │  └── ingress.yaml              │
-│  └── grafana-app.yaml       │                                │
+│  argocd/                    │  infrastructure/argocd/       │
+│  ├── apps.yaml (App of Apps)│  ├── kustomization.yaml       │
+│  ├── argocd-app.yaml        │  └── ingress.yaml             │
+│  └── grafana-app.yaml       │                               │
 ├─────────────────────────────────────────────────────────────┤
-│  apps/grafana/                                               │
-│  ├── deployment.yaml                                         │
-│  ├── service.yaml                                            │
-│  └── ingress.yaml                                            │
+│  apps/grafana/                                              │
+│  ├── deployment.yaml                                        │
+│  ├── service.yaml                                           │
+│  └── ingress.yaml                                           │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                     ArgoCD (Self-Managed)                    │
-│  Syncs all applications from Git automatically               │
+│                     ArgoCD (Self-Managed)                   │
+│  Syncs all applications from Git automatically              │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Kubernetes Cluster                        │
+│                    Kubernetes Cluster                       │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
 │  │   argocd    │  │  monitoring │  │    ...      │          │
 │  │  namespace  │  │  namespace  │  │  namespace  │          │
