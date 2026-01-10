@@ -7,11 +7,19 @@ image:
   repository: bitnamilegacy/elasticsearch
   tag: 9.1.2-debian-12-r0
 
-# Disable init containers that cause image pull issues
+# Init containers using bitnamilegacy images
 volumePermissions:
-  enabled: false
+  enabled: false  # Not needed without persistence
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/os-shell
+    tag: 12-debian-12-r51
 sysctlImage:
-  enabled: false
+  enabled: true
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/os-shell
+    tag: 12-debian-12-r51
 
 # Single master node (no data/coordinating separation)
 master:
