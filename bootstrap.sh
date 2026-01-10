@@ -1,6 +1,6 @@
 #!/bin/bash
 kubectl apply -f infrastructure/argocd/namespace.yaml
-kubectl apply -f infrastructure/argocd/install.yaml
+kubectl apply -n argocd -f infrastructure/argocd/install.yaml
 echo "Waiting for ArgoCD deployment to be created..."
 until kubectl -n argocd get deployment argocd-server &>/dev/null; do
   sleep 2
