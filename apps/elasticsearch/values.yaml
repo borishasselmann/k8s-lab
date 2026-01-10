@@ -1,6 +1,16 @@
 # Bitnami Elasticsearch Single Node for k3d
 # Chart: https://github.com/bitnami/charts/tree/main/bitnami/elasticsearch
 
+# Use bitnamilegacy images (Bitnami moved to paid registry Aug 2025)
+global:
+  imageRegistry: docker.io/bitnamilegacy
+
+# Disable init containers that use os-shell
+volumePermissions:
+  enabled: false
+sysctlImage:
+  enabled: false
+
 # Single master node (no data/coordinating separation)
 master:
   replicaCount: 1
