@@ -28,6 +28,33 @@ k3d cluster create dev -p "80:80@loadbalancer"
 **Access:**
 - ArgoCD: http://argocd.localhost (admin / password from bootstrap output)
 - Grafana: http://grafana.localhost (admin / admin)
+- Prometheus: http://prometheus.localhost
+- Nginx Demo: http://nginx.localhost
+
+## Components
+
+| Component          | Purpose                      | Namespace  |
+| ------------------ | ---------------------------- | ---------- |
+| ArgoCD             | GitOps continuous delivery   | argocd     |
+| Prometheus         | Metrics collection & storage | monitoring |
+| Grafana            | Metrics visualization        | monitoring |
+| kube-state-metrics | Kubernetes object metrics    | monitoring |
+| node-exporter      | Host/node metrics            | monitoring |
+| Nginx              | Demo application             | nginx      |
+
+### Grafana Dashboards
+
+Pre-configured dashboards from [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack):
+
+| Dashboard                       | Description                              |
+| ------------------------------- | ---------------------------------------- |
+| Kubernetes / Cluster            | Cluster-wide resource overview           |
+| Kubernetes / Kubelet            | Kubelet operations, pod starts, PLEG     |
+| Kubernetes / Nodes              | Node CPU, memory, disk, network          |
+| Kubernetes / Networking / Pod   | Per-pod network bandwidth and packets    |
+| Kubernetes / Persistent Volumes | PVC space and inode usage                |
+| Prometheus / Overview           | Prometheus self-monitoring               |
+| K8s Node Metrics                | Detailed node-exporter metrics           |
 
 ## Architecture
 
@@ -123,16 +150,28 @@ patches:
 ├── argocd/                      # ArgoCD Application definitions
 │   ├── apps.yaml                # App of Apps (root application)
 │   ├── argocd-app.yaml          # ArgoCD self-management
-│   └── grafana-app.yaml         # Grafana application
+│   ├── grafana-app.yaml         # Grafana application
+│   ├── prometheus-app.yaml      # Prometheus application
+│   ├── kube-state-metrics-app.yaml
+│   ├── node-exporter-app.yaml
+│   └── nginx-app.yaml           # Demo application
 ├── infrastructure/              # Infrastructure components
 │   └── argocd/
 │       ├── kustomization.yaml   # Kustomize overlay
 │       └── ingress.yaml         # ArgoCD ingress
 └── apps/                        # Application manifests
-    └── grafana/
-        ├── deployment.yaml
-        ├── service.yaml
-        └── ingress.yaml
+    ├── grafana/
+    │   ├── deployment.yaml
+    │   ├── service.yaml
+    │   ├── ingress.yaml
+    │   └── dashboards/          # Grafana dashboard JSON files
+    ├── prometheus/
+    │   ├── deployment.yaml
+    │   ├── configmap.yaml       # Scrape configs
+    │   └── ...
+    ├── kube-state-metrics/
+    ├── node-exporter/
+    └── nginx/
 ```
 
 ## Best Practices Applied
@@ -204,6 +243,20 @@ kubectl rollout status deployment/  # Wait for ready state
 ```bash
 k3d cluster delete dev
 ```
+
+## Future Improvements
+
+Potential enhancements for this learning environment:
+
+| Feature | Description |
+| ------- | ----------- |
+| **Alertmanager** | Add Prometheus Alertmanager with alerting rules for cluster health |
+| **Persistent Storage** | PersistentVolumes for Prometheus/Grafana data (survives pod restarts) |
+| **Loki** | Log aggregation stack for centralized logging |
+| **Network Policies** | Namespace isolation for improved security |
+| **Resource Quotas** | Per-namespace resource limits |
+| **Prometheus Operator** | ServiceMonitors instead of static scrape configs |
+| **Sealed Secrets** | GitOps-compatible secret management |
 
 ## References
 
