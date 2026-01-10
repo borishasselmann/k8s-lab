@@ -20,6 +20,12 @@ spec:
         image: grafana/grafana:latest
         ports:
         - containerPort: 3000
+        env:
+          - name: GF_PATHS_PROVISIONING
+            value: /etc/grafana/provisioning
+        volumeMounts:
+          - name: datasources
+            mountPath: /etc/grafana/provisioning/datasources
         resources:
           requests:
             memory: "128Mi"
@@ -46,3 +52,7 @@ spec:
           capabilities:
             drop:
               - ALL
+      volumes:
+        - name: datasources
+          configMap:
+            name: grafana-datasources
