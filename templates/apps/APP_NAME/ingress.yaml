@@ -1,0 +1,22 @@
+# Optional: External access via Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: APP_NAME
+  namespace: NAMESPACE
+  labels:
+    app.kubernetes.io/name: APP_NAME
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: APP_NAME.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: APP_NAME
+                port:
+                  name: http

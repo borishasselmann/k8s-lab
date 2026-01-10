@@ -1,0 +1,63 @@
+# Optional: Network isolation and high availability
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: APP_NAME
+  namespace: NAMESPACE
+  labels:
+    app.kubernetes.io/name: APP_NAME
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: APP_NAME
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from ingress controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: traefik
+      ports:
+        - protocol: TCP
+          port: http
+    # Allow traffic from same namespace
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: http
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow traffic to same namespace
+    - to:
+        - podSelector: {}
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: APP_NAME
+  namespace: NAMESPACE
+  labels:
+    app.kubernetes.io/name: APP_NAME
+spec:
+  # At least 1 pod must be available (requires replicas > 1)
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: APP_NAME

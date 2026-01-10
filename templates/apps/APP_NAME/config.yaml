@@ -1,0 +1,43 @@
+# Optional: Configuration, secrets, and persistent storage
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: APP_NAME-config
+  namespace: NAMESPACE
+  labels:
+    app.kubernetes.io/name: APP_NAME
+data:
+  # Add your configuration here
+  config.yaml: |
+    key: value
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: APP_NAME-secret
+  namespace: NAMESPACE
+  labels:
+    app.kubernetes.io/name: APP_NAME
+type: Opaque
+stringData:
+  # Add your secrets here (use Sealed Secrets in production!)
+  password: "changeme"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: APP_NAME-data
+  namespace: NAMESPACE
+  labels:
+    app.kubernetes.io/name: APP_NAME
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  # storageClassName: local-path  # Uncomment for k3d
