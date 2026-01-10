@@ -18,5 +18,10 @@ configMapGenerator:
     files:
       - dashboards/kubernetes-cluster.json
       - dashboards/node-exporter.json
+      - dashboards/nodes.json
+      - dashboards/kubelet.json
+      - dashboards/prometheus.json
+      - dashboards/pod-total.json
+      - dashboards/persistentvolumesusage.json
     options:
       disableNameSuffixHash: true
