@@ -31,16 +31,23 @@ k3d cluster create dev -p "80:80@loadbalancer"
 - Prometheus: http://prometheus.localhost
 - Nginx Demo: http://nginx.localhost
 
+**kube-prometheus-stack** (alternative full stack):
+
+- Grafana: <http://grafana-stack.localhost> (admin / admin)
+- Prometheus: <http://prometheus-stack.localhost>
+- Alertmanager: <http://alertmanager.localhost>
+
 ## Components
 
-| Component          | Purpose                      | Namespace  |
-| ------------------ | ---------------------------- | ---------- |
-| ArgoCD             | GitOps continuous delivery   | argocd     |
-| Prometheus         | Metrics collection & storage | monitoring |
-| Grafana            | Metrics visualization        | monitoring |
-| kube-state-metrics | Kubernetes object metrics    | monitoring |
-| node-exporter      | Host/node metrics            | monitoring |
-| Nginx              | Demo application             | nginx      |
+| Component               | Purpose                      | Namespace       |
+| ----------------------- | ---------------------------- | --------------- |
+| ArgoCD                  | GitOps continuous delivery   | argocd          |
+| Prometheus              | Metrics collection & storage | monitoring      |
+| Grafana                 | Metrics visualization        | monitoring      |
+| kube-state-metrics      | Kubernetes object metrics    | monitoring      |
+| node-exporter           | Host/node metrics            | monitoring      |
+| Nginx                   | Demo application             | nginx           |
+| kube-prometheus-stack   | Full monitoring stack (Helm) | kube-prometheus |
 
 ### Grafana Dashboards
 

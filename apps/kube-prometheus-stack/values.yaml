@@ -1,0 +1,129 @@
+# kube-prometheus-stack Helm values
+# Docs: https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+
+# Use a separate namespace to avoid conflicts with existing monitoring setup
+namespaceOverride: kube-prometheus
+
+# Grafana configuration
+grafana:
+  enabled: true
+  adminPassword: admin
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - grafana-stack.localhost
+  # All dashboards are included by default
+
+# Prometheus configuration
+prometheus:
+  enabled: true
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - prometheus-stack.localhost
+  prometheusSpec:
+    # Resource limits for k3d local development
+    resources:
+      requests:
+        memory: 400Mi
+        cpu: 100m
+      limits:
+        memory: 1Gi
+        cpu: 500m
+    # Retention
+    retention: 7d
+    retentionSize: 5GB
+    # Storage (optional - uses emptyDir by default)
+    # storageSpec:
+    #   volumeClaimTemplate:
+    #     spec:
+    #       accessModes: ["ReadWriteOnce"]
+    #       resources:
+    #         requests:
+    #           storage: 10Gi
+
+# Alertmanager configuration
+alertmanager:
+  enabled: true
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - alertmanager.localhost
+  alertmanagerSpec:
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 10m
+      limits:
+        memory: 128Mi
+        cpu: 100m
+
+# Node Exporter - metrics from each node
+nodeExporter:
+  enabled: true
+
+# kube-state-metrics - metrics about Kubernetes objects
+kubeStateMetrics:
+  enabled: true
+
+# Prometheus Operator
+prometheusOperator:
+  enabled: true
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 10m
+    limits:
+      memory: 256Mi
+      cpu: 200m
+
+# Default PrometheusRules (alerting rules)
+defaultRules:
+  create: true
+  rules:
+    alertmanager: true
+    etcd: false  # Not accessible in k3d
+    configReloaders: true
+    general: true
+    k8sContainerCpuUsageSecondsTotal: true
+    k8sContainerMemoryCache: true
+    k8sContainerMemoryRss: true
+    k8sContainerMemorySwap: true
+    k8sContainerResource: true
+    k8sPodOwner: true
+    kubeApiserverAvailability: true
+    kubeApiserverBurnrate: true
+    kubeApiserverHistogram: true
+    kubeApiserverSlos: true
+    kubeControllerManager: false  # Not accessible in k3d
+    kubelet: true
+    kubeProxy: false  # Not accessible in k3d
+    kubePrometheusGeneral: true
+    kubePrometheusNodeRecording: true
+    kubernetesApps: true
+    kubernetesResources: true
+    kubernetesStorage: true
+    kubernetesSystem: true
+    kubeSchedulerAlerting: false  # Not accessible in k3d
+    kubeSchedulerRecording: false  # Not accessible in k3d
+    kubeStateMetrics: true
+    network: true
+    node: true
+    nodeExporterAlerting: true
+    nodeExporterRecording: true
+    prometheus: true
+    prometheusOperator: true
+    windows: false
+
+# Scrape configs for components not accessible in k3d
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeEtcd:
+  enabled: false
