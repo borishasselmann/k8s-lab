@@ -4,7 +4,8 @@ metadata:
   name: grafana
   namespace: monitoring
 spec:
-  replicas: 2
+  # Single replica - multiple replicas require shared storage for session persistence
+  replicas: 1
   selector:
     matchLabels:
       app: grafana
