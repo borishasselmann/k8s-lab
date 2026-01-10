@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - datasource.yaml
+  - dashboard-provider.yaml
+
+namespace: monitoring
+
+# Generate ConfigMap from official Grafana community dashboards
+# - Node Exporter Full (ID: 1860) - https://grafana.com/grafana/dashboards/1860
+# - Kubernetes Cluster (ID: 7249) - https://grafana.com/grafana/dashboards/7249
+configMapGenerator:
+  - name: grafana-dashboards
+    files:
+      - dashboards/kubernetes-cluster.json
+      - dashboards/node-exporter-full.json
+    options:
+      disableNameSuffixHash: true
