@@ -19,4 +19,4 @@ spec:
     syncOptions:
     - CreateNamespace=true
     # ServerSideApply required if Dashboard ConfigMaps exceed the 262KB annotation size limit
-    # - ServerSideApply=true
+    - ServerSideApply=true
