@@ -32,6 +32,15 @@ master:
   persistence:
     enabled: false
   heapSize: 1024m
+  # Single node: set replicas to 0 so indices can be green
+  extraEnvVars:
+    - name: "discovery.type"
+      value: "single-node"
+
+# Index settings for single node (no replicas)
+extraConfig:
+  action.auto_create_index: "true"
+  index.number_of_replicas: "0"
 
 # Disable other node types for single-node setup
 data:
