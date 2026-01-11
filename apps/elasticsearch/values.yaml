@@ -37,10 +37,9 @@ master:
     - name: "discovery.type"
       value: "single-node"
 
-# Index settings for single node (no replicas)
+# Cluster settings for single node
 extraConfig:
   action.auto_create_index: "true"
-  index.number_of_replicas: "0"
 
 # Disable other node types for single-node setup
 data:
