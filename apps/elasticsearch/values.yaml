@@ -1,6 +1,10 @@
 # Bitnami Elasticsearch Single Node for k3d
 # Chart: https://github.com/bitnami/charts/tree/main/bitnami/elasticsearch
 
+# Global settings
+global:
+  kibanaEnabled: true
+
 # Use bitnamilegacy images (Bitnami moved to paid registry Aug 2025)
 image:
   registry: docker.io
@@ -67,70 +71,11 @@ ingress:
 metrics:
   enabled: false
 
-# Kibana (bundled subchart)
+# Kibana (bundled subchart - enabled via global.kibanaEnabled)
+# Note: Only elasticsearch connection params are configurable here
+# For full Kibana customization, use separate kibana deployment
 kibana:
-  enabled: true
-  # Use bitnamilegacy images
-  image:
-    registry: docker.io
-    repository: bitnamilegacy/kibana
-    tag: 9.1.2-debian-12-r0
-  # Init container image (copy-default-plugins)
-  volumePermissions:
-    enabled: false
-    image:
-      registry: docker.io
-      repository: bitnamilegacy/os-shell
-      tag: 12-debian-12-r51
-  # Single replica for local dev
-  replicaCount: 1
-  # Resources
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "1Gi"
-    limits:
-      cpu: "1000m"
-      memory: "2Gi"
-  # Health probes - Kibana needs longer startup time
-  livenessProbe:
-    enabled: true
-    initialDelaySeconds: 180
-    periodSeconds: 10
-    timeoutSeconds: 10
-    failureThreshold: 6
-  readinessProbe:
-    enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 10
-    timeoutSeconds: 10
-    failureThreshold: 6
-  # Ingress
-  ingress:
-    enabled: true
-    ingressClassName: traefik
-    hostname: kibana.localhost
-  # Persistence
-  persistence:
-    enabled: false
-  # Security context
-  podSecurityContext:
-    enabled: true
-    fsGroup: 1001
-  containerSecurityContext:
-    enabled: true
-    runAsUser: 1001
-    runAsGroup: 1001
-    runAsNonRoot: true
-    allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
-    capabilities:
-      drop:
-        - ALL
-  # ServiceAccount
-  serviceAccount:
-    create: true
-    automountServiceAccountToken: false
-  # PDB disabled for single replica
-  pdb:
-    create: false
+  elasticsearch:
+    hosts:
+      - '{{ include "elasticsearch.service.name" . }}'
+    port: '{{ include "elasticsearch.service.ports.restAPI" . }}'
