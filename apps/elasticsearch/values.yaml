@@ -72,10 +72,9 @@ metrics:
   enabled: false
 
 # Kibana (bundled subchart - enabled via global.kibanaEnabled)
-# Note: Only elasticsearch connection params are configurable here
-# For full Kibana customization, use separate kibana deployment
 kibana:
-  elasticsearch:
-    hosts:
-      - '{{ include "elasticsearch.service.name" . }}'
-    port: '{{ include "elasticsearch.service.ports.restAPI" . }}'
+  # Use bitnamilegacy images
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/kibana
+    tag: 9.1.2-debian-12-r0
