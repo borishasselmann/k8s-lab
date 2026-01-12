@@ -78,3 +78,23 @@ kibana:
     registry: docker.io
     repository: bitnamilegacy/kibana
     tag: 9.1.2-debian-12-r0
+  # Resources - Kibana 9.x needs more memory
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"
+  # Longer probe timeouts for Kibana startup
+  livenessProbe:
+    initialDelaySeconds: 180
+    timeoutSeconds: 10
+  readinessProbe:
+    initialDelaySeconds: 60
+    timeoutSeconds: 10
+  # Ingress
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hostname: kibana.localhost
