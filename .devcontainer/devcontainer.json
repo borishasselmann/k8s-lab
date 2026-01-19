@@ -2,8 +2,8 @@
   "name": "k8s-lab",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "hostRequirements": {
-    "cpus": 4,
-    "memory": "16gb"
+    "cpus": 8,
+    "memory": "32gb"
   },
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
