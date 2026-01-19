@@ -32,8 +32,10 @@ All components mirror production setups, making this an ideal environment for le
 
 ## Quick Start
 
+### Local Development
+
 ```bash
-# Create cluster and deploy everything
+# Create cluster with port mapping for ingress
 k3d cluster create dev -p "80:80@loadbalancer"
 ./bootstrap.sh
 ```
@@ -43,6 +45,10 @@ k3d cluster create dev -p "80:80@loadbalancer"
 - Grafana: http://grafana.localhost (admin / admin)
 - Prometheus: http://prometheus.localhost
 - Nginx Demo: http://nginx.localhost
+
+### GitHub Codespaces
+
+For running this lab in GitHub Codespaces, see [CODESPACES_SETUP.md](CODESPACES_SETUP.md).
 
 **kube-prometheus-stack** (alternative full stack):
 
