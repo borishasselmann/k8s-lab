@@ -3,3 +3,7 @@ set -e
 
 # k3d (no official devcontainer feature available)
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+
+# pre-commit
+pip install pre-commit
+pre-commit install
