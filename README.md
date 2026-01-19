@@ -1,6 +1,19 @@
 # k8s-lab
 
-A GitOps-based Kubernetes learning environment using ArgoCD and Kustomize.
+A production-ready GitOps-based Kubernetes learning environment using ArgoCD and Kustomize.
+
+## What You'll Learn
+
+This lab provides hands-on experience with:
+
+- **GitOps Workflows** - Declarative configuration management with ArgoCD
+- **Kubernetes Core Concepts** - Deployments, Services, Ingress, ConfigMaps
+- **Observability Stack** - Full monitoring, logging, and tracing setup
+- **Infrastructure as Code** - Kustomize overlays and patching strategies
+- **Continuous Delivery** - Automated sync with self-healing capabilities
+- **Real-World Patterns** - App-of-Apps, self-management, and best practices
+
+All components mirror production setups, making this an ideal environment for learning Kubernetes operations.
 
 ## Prerequisites
 
