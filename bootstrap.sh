@@ -3,7 +3,7 @@ set -e  # Exit on error
 
 # Install ArgoCD with Kustomize (includes --insecure patch and ingress)
 kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
-kubectl apply -k infrastructure/argocd/
+kubectl apply -k infrastructure/argocd/ --server-side
 
 # Wait for deployment to be ready
 echo "Waiting for ArgoCD deployment..."
