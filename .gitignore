@@ -6,6 +6,6 @@
 # OS
 .DS_Store
 
-# Secrets (niemals committen!)
+# Secrets (never commit!)
 *-secret.yaml
 secrets/

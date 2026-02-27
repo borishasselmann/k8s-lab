@@ -35,38 +35,36 @@ All components mirror production setups, making this an ideal environment for le
 ### Local Development
 
 ```bash
-# Create cluster with port mapping for ingress
-k3d cluster create dev -p "80:80@loadbalancer"
 ./bootstrap.sh
 ```
 
+Kubeconfig is written to `~/.kube/config-k3d-dev` (picked up automatically via `KUBECONFIG` glob).
+
 **Access:**
-- ArgoCD: http://argocd.localhost (admin / password from bootstrap output)
-- Grafana: http://grafana.localhost (admin / admin)
-- Prometheus: http://prometheus.localhost
-- Nginx Demo: http://nginx.localhost
+
+- ArgoCD: <http://argocd.localhost> (admin / password from bootstrap output)
+- Grafana: <http://grafana-stack.localhost> (admin / admin)
+- Prometheus: <http://prometheus-stack.localhost>
+- Alertmanager: <http://alertmanager.localhost>
+- Elasticsearch: <http://elasticsearch.localhost>
+- Kibana: <http://kibana.localhost>
+- Jaeger: <http://jaeger.localhost>
+- Nginx Demo: <http://nginx.localhost>
 
 ### GitHub Codespaces
 
 For running this lab in GitHub Codespaces, see [CODESPACES_SETUP.md](CODESPACES_SETUP.md).
 
-**kube-prometheus-stack** (alternative full stack):
-
-- Grafana: <http://grafana-stack.localhost> (admin / admin)
-- Prometheus: <http://prometheus-stack.localhost>
-- Alertmanager: <http://alertmanager.localhost>
-
 ## Components
 
-| Component               | Purpose                      | Namespace       |
-| ----------------------- | ---------------------------- | --------------- |
-| ArgoCD                  | GitOps continuous delivery   | argocd          |
-| Prometheus              | Metrics collection & storage | monitoring      |
-| Grafana                 | Metrics visualization        | monitoring      |
-| kube-state-metrics      | Kubernetes object metrics    | monitoring      |
-| node-exporter           | Host/node metrics            | monitoring      |
-| Nginx                   | Demo application             | nginx           |
-| kube-prometheus-stack   | Full monitoring stack (Helm) | kube-prometheus |
+| Component             | Purpose                                        | Namespace       |
+| --------------------- | ---------------------------------------------- | --------------- |
+| ArgoCD                | GitOps continuous delivery                     | argocd          |
+| kube-prometheus-stack | Prometheus, Grafana, Alertmanager (Helm)       | kube-prometheus |
+| Elasticsearch         | Search & analytics engine, log storage (Helm)  | logging         |
+| Kibana                | Log visualization (bundled with Elasticsearch) | logging         |
+| Jaeger                | Distributed tracing (Helm)                     | tracing         |
+| Nginx                 | Demo application                               | nginx           |
 
 ### Grafana Dashboards
 
@@ -91,27 +89,19 @@ Pre-configured dashboards from [kube-prometheus-stack](https://github.com/promet
 │  argocd/                    │  infrastructure/argocd/       │
 │  ├── apps.yaml (App of Apps)│  ├── kustomization.yaml       │
 │  ├── argocd-app.yaml        │  └── ingress.yaml             │
-│  └── grafana-app.yaml       │                               │
+│  ├── nginx-app.yaml         │                               │
+│  └── kube-prometheus-...    │  apps/nginx/                  │
+│                             │  ├── deployment.yaml          │
+│  apps/kube-prometheus-stack/│  ├── service.yaml             │
+│  └── values.yaml (Helm)    │  └── ingress.yaml             │
 ├─────────────────────────────────────────────────────────────┤
-│  apps/grafana/                                              │
-│  ├── deployment.yaml                                        │
-│  ├── service.yaml                                           │
-│  └── ingress.yaml                                           │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
 │                     ArgoCD (Self-Managed)                   │
-│  Syncs all applications from Git automatically              │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Kubernetes Cluster                       │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │   argocd    │  │  monitoring │  │    ...      │          │
-│  │  namespace  │  │  namespace  │  │  namespace  │          │
-│  └─────────────┘  └─────────────┘  └─────────────┘          │
+│          Syncs all applications from Git automatically      │
+├─────────────────────────────────────────────────────────────┤
+│                    Kubernetes Cluster (k3d)                 │
+│  ┌──────────┐ ┌───────────────┐ ┌─────────┐ ┌───────────┐  │
+│  │ argocd   │ │kube-prometheus│ │ logging │ │  tracing  │  │
+│  └──────────┘ └───────────────┘ └─────────┘ └───────────┘  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -172,32 +162,24 @@ patches:
 
 ```
 .
-├── bootstrap.sh                 # Initial cluster setup
-├── argocd/                      # ArgoCD Application definitions
-│   ├── apps.yaml                # App of Apps (root application)
-│   ├── argocd-app.yaml          # ArgoCD self-management
-│   ├── grafana-app.yaml         # Grafana application
-│   ├── prometheus-app.yaml      # Prometheus application
-│   ├── kube-state-metrics-app.yaml
-│   ├── node-exporter-app.yaml
-│   └── nginx-app.yaml           # Demo application
-├── infrastructure/              # Infrastructure components
+├── bootstrap.sh                     # Initial cluster setup
+├── argocd/                          # ArgoCD Application definitions
+│   ├── apps.yaml                    # App of Apps (root application)
+│   ├── argocd-app.yaml              # ArgoCD self-management
+│   ├── nginx-app.yaml               # Demo application
+│   ├── kube-prometheus-stack-app.yaml # Monitoring stack (Helm)
+│   ├── elasticsearch-app.yaml       # Log storage (Helm)
+│   ├── jaeger-app.yaml              # Distributed tracing (Helm)
+│   └── disabled/                    # Deactivated applications
+├── infrastructure/                  # Infrastructure components
 │   └── argocd/
-│       ├── kustomization.yaml   # Kustomize overlay
-│       └── ingress.yaml         # ArgoCD ingress
-└── apps/                        # Application manifests
-    ├── grafana/
-    │   ├── deployment.yaml
-    │   ├── service.yaml
-    │   ├── ingress.yaml
-    │   └── dashboards/          # Grafana dashboard JSON files
-    ├── prometheus/
-    │   ├── deployment.yaml
-    │   ├── configmap.yaml       # Scrape configs
-    │   └── ...
-    ├── kube-state-metrics/
-    ├── node-exporter/
-    └── nginx/
+│       ├── kustomization.yaml       # Kustomize overlay
+│       └── ingress.yaml             # ArgoCD ingress
+└── apps/                            # Application manifests & Helm values
+    ├── nginx/                       # Kubernetes manifests
+    ├── kube-prometheus-stack/       # Helm values
+    ├── elasticsearch/               # Helm values (includes Kibana)
+    └── jaeger/                      # Helm values
 ```
 
 ## Best Practices Applied
@@ -268,6 +250,7 @@ kubectl rollout status deployment/  # Wait for ready state
 
 ```bash
 k3d cluster delete dev
+rm -f ~/.kube/config-k3d-dev
 ```
 
 ## Future Improvements
@@ -276,12 +259,10 @@ Potential enhancements for this learning environment:
 
 | Feature | Description |
 | ------- | ----------- |
-| **Alertmanager** | Add Prometheus Alertmanager with alerting rules for cluster health |
 | **Persistent Storage** | PersistentVolumes for Prometheus/Grafana data (survives pod restarts) |
 | **Loki** | Log aggregation stack for centralized logging |
 | **Network Policies** | Namespace isolation for improved security |
 | **Resource Quotas** | Per-namespace resource limits |
-| **Prometheus Operator** | ServiceMonitors instead of static scrape configs |
 | **Sealed Secrets** | GitOps-compatible secret management |
 
 ## References

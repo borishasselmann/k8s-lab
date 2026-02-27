@@ -13,17 +13,12 @@ Perfect for learning Kubernetes without installing Docker, k3d, or kubectl local
 
 ## Setup
 
-1. **Create K3d Cluster**
+1. **Bootstrap Cluster & ArgoCD**
    ```bash
-   k3d cluster create dev
+   ./bootstrap.sh --codespaces
    ```
 
-   **Note:** No port mapping needed, as Ingress doesn't work with dynamic Codespaces URLs.
-
-2. **Bootstrap ArgoCD**
-   ```bash
-   ./bootstrap.sh
-   ```
+   **Note:** In Codespaces, Ingress doesn't work with dynamic URLs. Use port-forwarding instead (see below).
 
 ## Accessing Apps in Browser
 
@@ -43,6 +38,9 @@ kubectl port-forward -n kube-prometheus svc/kube-prometheus-stack-grafana 8082:8
 
 # Prometheus
 kubectl port-forward -n kube-prometheus svc/kube-prometheus-stack-prometheus 8083:9090 > /dev/null 2>&1 &
+
+# Alertmanager
+kubectl port-forward -n kube-prometheus svc/kube-prometheus-stack-alertmanager 8086:9093 > /dev/null 2>&1 &
 
 # Kibana
 kubectl port-forward -n logging svc/elasticsearch-kibana 8084:5601 > /dev/null 2>&1 &
