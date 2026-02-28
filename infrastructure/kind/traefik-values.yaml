@@ -28,10 +28,26 @@ tolerations:
     effect: "NoSchedule"
 
 # Single replica is sufficient for local development
+# Recreate strategy required because hostPort can only be bound by one pod at a time
 deployment:
   replicas: 1
+updateStrategy:
+  type: Recreate
 
 # Disable TLS redirect for local development (matches k3d behavior)
 ingressRoute:
   dashboard:
     enabled: false
+
+# Use ClusterIP since we use hostPort (LoadBalancer stays <pending> in kind)
+service:
+  type: ClusterIP
+
+# Set ingress status to "localhost" so ArgoCD sees Ingress resources as Healthy
+# (kind has no LoadBalancer controller, so publishedService won't work)
+providers:
+  kubernetesIngress:
+    publishedService:
+      enabled: false
+additionalArguments:
+  - "--providers.kubernetesingress.ingressendpoint.hostname=localhost"
