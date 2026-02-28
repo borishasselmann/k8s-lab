@@ -9,17 +9,17 @@ if [[ "$1" == "--codespaces" ]]; then
   K3D_ARGS=()
 fi
 
-# Write to dedicated kubeconfig file instead of ~/.kube/config
-export KUBECONFIG="${KUBECONFIG_FILE}"
-
 # Create k3d cluster if it doesn't exist
+# --kubeconfig-update-default=false prevents k3d from managing the default kubeconfig,
+# avoiding warnings on deletion when KUBECONFIG contains multiple files
 if ! k3d cluster list | grep -q "^dev "; then
   echo "Creating k3d cluster 'dev'..."
-  k3d cluster create dev "${K3D_ARGS[@]}"
-else
-  echo "Cluster 'dev' already exists, writing kubeconfig..."
-  k3d kubeconfig get dev > "${KUBECONFIG_FILE}"
+  k3d cluster create dev "${K3D_ARGS[@]}" --kubeconfig-update-default=false
 fi
+
+# Write kubeconfig to dedicated file instead of ~/.kube/config
+k3d kubeconfig get dev > "${KUBECONFIG_FILE}"
+export KUBECONFIG="${KUBECONFIG_FILE}"
 
 # Install ArgoCD with Kustomize (includes --insecure patch and ingress)
 kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
