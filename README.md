@@ -73,6 +73,7 @@ For running this lab in GitHub Codespaces, see [CODESPACES_SETUP.md](CODESPACES_
 | Elasticsearch         | Search & analytics engine, log storage (Helm)  | logging         |
 | Kibana                | Log visualization (bundled with Elasticsearch) | logging         |
 | Jaeger                | Distributed tracing (Helm)                     | tracing         |
+| Traefik               | Ingress controller (kind only, via Helm)       | traefik         |
 | Nginx                 | Demo application                               | nginx           |
 
 ### Grafana Dashboards
@@ -189,11 +190,14 @@ patches:
 │       ├── cluster-config.yaml      # Port mappings + node labels
 │       ├── cluster-config-codespaces.yaml
 │       └── traefik-values.yaml      # Traefik Helm values
-└── apps/                            # Application manifests & Helm values
-    ├── nginx/                       # Kubernetes manifests
-    ├── kube-prometheus-stack/       # Helm values
-    ├── elasticsearch/               # Helm values (includes Kibana)
-    └── jaeger/                      # Helm values
+├── apps/                            # Application manifests & Helm values
+│   ├── nginx/                       # Kubernetes manifests
+│   ├── kube-prometheus-stack/       # Helm values
+│   ├── elasticsearch/               # Helm values (includes Kibana)
+│   └── jaeger/                      # Helm values
+└── templates/                       # Scaffolding templates for new applications
+    ├── create-app.sh                # App creation script
+    └── README.md                    # Template documentation
 ```
 
 ## Best Practices Applied

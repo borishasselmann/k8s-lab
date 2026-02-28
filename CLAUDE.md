@@ -91,6 +91,7 @@ Upstream manifests are never modified directly. Use Kustomize overlays in `infra
 | `kube-prometheus` | kube-prometheus-stack (Prometheus, Grafana, Alertmanager) |
 | `logging` | Elasticsearch, Kibana |
 | `tracing` | Jaeger |
+| `traefik` | Traefik ingress controller (kind only, installed via Helm) |
 | `nginx` | Demo application |
 
 ## Adding/Updating Applications

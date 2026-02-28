@@ -14,8 +14,15 @@ Perfect for learning Kubernetes without installing Docker, k3d, or kubectl local
 ## Setup
 
 1. **Bootstrap Cluster & ArgoCD**
+
+   Using k3d (default):
    ```bash
    ./bootstrap.sh --codespaces
+   ```
+
+   Using kind (alternative, requires `helm`):
+   ```bash
+   ./bootstrap-kind.sh --codespaces
    ```
 
    **Note:** In Codespaces, Ingress doesn't work with dynamic URLs. Use port-forwarding instead (see below).
