@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
-    targetRevision: 67.9.0  # Check for latest: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+    targetRevision: 82.4.3  # Check for latest: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
     helm:
       valueFiles:
         - $values/apps/kube-prometheus-stack/values.yaml
@@ -16,7 +16,7 @@ spec:
   sources:
     - repoURL: https://prometheus-community.github.io/helm-charts
       chart: kube-prometheus-stack
-      targetRevision: 67.9.0
+      targetRevision: 82.4.3
       helm:
         valueFiles:
           - $values/apps/kube-prometheus-stack/values.yaml
