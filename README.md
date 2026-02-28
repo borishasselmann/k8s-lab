@@ -20,8 +20,9 @@ All components mirror production setups, making this an ideal environment for le
 | Tool | Required |
 |------|----------|
 | Docker | Yes |
-| k3d | Yes |
+| k3d or kind | Yes (one of them) |
 | kubectl | Yes |
+| helm | Only for kind bootstrap |
 
 **Platform Support:**
 - macOS: Full support
@@ -32,13 +33,21 @@ All components mirror production setups, making this an ideal environment for le
 
 ## Quick Start
 
-### Local Development
+### Local Development (k3d)
 
 ```bash
 ./bootstrap.sh
 ```
 
 Kubeconfig is written to `~/.kube/config-k3d-dev` (picked up automatically via `KUBECONFIG` glob).
+
+### Local Development (kind)
+
+```bash
+./bootstrap-kind.sh
+```
+
+Kubeconfig is written to `~/.kube/config-kind-dev`. Traefik is installed via Helm to match the ingress controller built into k3d.
 
 **Access:**
 
@@ -98,7 +107,7 @@ Pre-configured dashboards from [kube-prometheus-stack](https://github.com/promet
 │                     ArgoCD (Self-Managed)                   │
 │          Syncs all applications from Git automatically      │
 ├─────────────────────────────────────────────────────────────┤
-│                    Kubernetes Cluster (k3d)                 │
+│                  Kubernetes Cluster (k3d/kind)               │
 │  ┌──────────┐ ┌───────────────┐ ┌─────────┐ ┌───────────┐  │
 │  │ argocd   │ │kube-prometheus│ │ logging │ │  tracing  │  │
 │  └──────────┘ └───────────────┘ └─────────┘ └───────────┘  │
@@ -162,7 +171,8 @@ patches:
 
 ```
 .
-├── bootstrap.sh                     # Initial cluster setup
+├── bootstrap.sh                     # Cluster setup with k3d
+├── bootstrap-kind.sh                # Cluster setup with kind
 ├── argocd/                          # ArgoCD Application definitions
 │   ├── apps.yaml                    # App of Apps (root application)
 │   ├── argocd-app.yaml              # ArgoCD self-management
@@ -172,9 +182,13 @@ patches:
 │   ├── jaeger-app.yaml              # Distributed tracing (Helm)
 │   └── disabled/                    # Deactivated applications
 ├── infrastructure/                  # Infrastructure components
-│   └── argocd/
-│       ├── kustomization.yaml       # Kustomize overlay
-│       └── ingress.yaml             # ArgoCD ingress
+│   ├── argocd/
+│   │   ├── kustomization.yaml       # Kustomize overlay
+│   │   └── ingress.yaml             # ArgoCD ingress
+│   └── kind/                        # kind cluster configuration
+│       ├── cluster-config.yaml      # Port mappings + node labels
+│       ├── cluster-config-codespaces.yaml
+│       └── traefik-values.yaml      # Traefik Helm values
 └── apps/                            # Application manifests & Helm values
     ├── nginx/                       # Kubernetes manifests
     ├── kube-prometheus-stack/       # Helm values
@@ -248,9 +262,18 @@ kubectl rollout status deployment/  # Wait for ready state
 
 ## Teardown
 
+### k3d
+
 ```bash
 k3d cluster delete dev
 rm -f ~/.kube/config-k3d-dev
+```
+
+### kind
+
+```bash
+kind delete cluster --name dev
+rm -f ~/.kube/config-kind-dev
 ```
 
 ## Future Improvements

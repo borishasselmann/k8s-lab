@@ -1,0 +1,37 @@
+# Traefik Helm values for kind cluster
+# Matches the built-in Traefik behavior of k3d/k3s
+
+# Use hostPort to bind directly to the node's port 80
+# Works with kind's extraPortMappings
+ports:
+  web:
+    port: 8000
+    exposedPort: 80
+    expose:
+      default: true
+    hostPort: 80
+  websecure:
+    port: 8443
+    exposedPort: 443
+    expose:
+      default: true
+    hostPort: 443
+
+# Run on nodes labeled ingress-ready=true (the control-plane in kind)
+nodeSelector:
+  ingress-ready: "true"
+
+# Tolerate control-plane taints so Traefik can run on the kind node
+tolerations:
+  - key: "node-role.kubernetes.io/control-plane"
+    operator: "Exists"
+    effect: "NoSchedule"
+
+# Single replica is sufficient for local development
+deployment:
+  replicas: 1
+
+# Disable TLS redirect for local development (matches k3d behavior)
+ingressRoute:
+  dashboard:
+    enabled: false

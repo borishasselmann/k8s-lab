@@ -4,21 +4,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A GitOps-based Kubernetes learning environment using ArgoCD, Kustomize, and k3d. All changes flow through Git and are automatically synced to the cluster by ArgoCD.
+A GitOps-based Kubernetes learning environment using ArgoCD, Kustomize, and k3d or kind. All changes flow through Git and are automatically synced to the cluster by ArgoCD.
 
 ## Commands
 
-### Cluster Setup
+### Cluster Setup (k3d)
+
 ```bash
 ./bootstrap.sh
 ```
 
 Kubeconfig is written to `~/.kube/config-k3d-dev` (picked up automatically via `KUBECONFIG` glob).
 
-### Teardown
+### Cluster Setup (kind)
+
+```bash
+./bootstrap-kind.sh
+```
+
+Kubeconfig is written to `~/.kube/config-kind-dev`. Traefik is installed via Helm.
+
+### Teardown (k3d)
+
 ```bash
 k3d cluster delete dev
 rm -f ~/.kube/config-k3d-dev
+```
+
+### Teardown (kind)
+
+```bash
+kind delete cluster --name dev
+rm -f ~/.kube/config-kind-dev
 ```
 
 ### Create New Application
@@ -61,6 +78,7 @@ ArgoCD manages its own configuration via GitOps:
 | `argocd/disabled/` | Deactivated ArgoCD Applications (not synced) |
 | `apps/<name>/` | Kubernetes manifests / Helm values for each application |
 | `infrastructure/argocd/` | ArgoCD's own Kustomize overlay |
+| `infrastructure/kind/` | kind cluster config and Traefik Helm values |
 | `templates/` | Scaffolding templates for new applications |
 
 ### Kustomize Patching
