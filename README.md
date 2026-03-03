@@ -103,15 +103,15 @@ Pre-configured dashboards from [kube-prometheus-stack](https://github.com/promet
 │  └── kube-prometheus-...    │  apps/nginx/                  │
 │                             │  ├── deployment.yaml          │
 │  apps/kube-prometheus-stack/│  ├── service.yaml             │
-│  └── values.yaml (Helm)    │  └── ingress.yaml             │
+│  └── values.yaml (Helm)     │  └── ingress.yaml             │
 ├─────────────────────────────────────────────────────────────┤
 │                     ArgoCD (Self-Managed)                   │
 │          Syncs all applications from Git automatically      │
 ├─────────────────────────────────────────────────────────────┤
-│                  Kubernetes Cluster (k3d/kind)               │
-│  ┌──────────┐ ┌───────────────┐ ┌─────────┐ ┌───────────┐  │
-│  │ argocd   │ │kube-prometheus│ │ logging │ │  tracing  │  │
-│  └──────────┘ └───────────────┘ └─────────┘ └───────────┘  │
+│                  Kubernetes Cluster (k3d/kind)              │
+│  ┌──────────┐ ┌───────────────┐ ┌─────────┐ ┌───────────┐   │
+│  │ argocd   │ │kube-prometheus│ │ logging │ │  tracing  │   │
+│  └──────────┘ └───────────────┘ └─────────┘ └───────────┘   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
