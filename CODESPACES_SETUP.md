@@ -5,7 +5,7 @@ Run a complete Kubernetes learning environment directly in your browser - no loc
 ## What This Environment Provides
 
 - **Full GitOps Stack** - ArgoCD managing all applications
-- **Complete Observability** - Prometheus, Grafana, Elasticsearch, Kibana, Jaeger
+- **Complete Observability** - Prometheus, Grafana, Alertmanager
 - **Zero Local Dependencies** - Everything runs in GitHub Codespaces
 - **Production Patterns** - Learn real-world Kubernetes best practices
 
@@ -37,23 +37,14 @@ GitHub Codespaces uses dynamic URLs, so Ingress-based routing with `.localhost` 
 # ArgoCD
 kubectl port-forward -n argocd svc/argocd-server 8080:80 > /dev/null 2>&1 &
 
-# Nginx
-kubectl port-forward -n nginx svc/nginx 8081:80 > /dev/null 2>&1 &
-
 # Grafana
-kubectl port-forward -n kube-prometheus svc/kube-prometheus-stack-grafana 8082:80 > /dev/null 2>&1 &
+kubectl port-forward -n kube-prometheus svc/kube-prometheus-stack-grafana 8081:80 > /dev/null 2>&1 &
 
 # Prometheus
-kubectl port-forward -n kube-prometheus svc/kube-prometheus-stack-prometheus 8083:9090 > /dev/null 2>&1 &
+kubectl port-forward -n kube-prometheus svc/kube-prometheus-stack-prometheus 8082:9090 > /dev/null 2>&1 &
 
 # Alertmanager
-kubectl port-forward -n kube-prometheus svc/kube-prometheus-stack-alertmanager 8086:9093 > /dev/null 2>&1 &
-
-# Kibana
-kubectl port-forward -n logging svc/elasticsearch-kibana 8084:5601 > /dev/null 2>&1 &
-
-# Jaeger
-kubectl port-forward -n tracing svc/jaeger 8085:16686 > /dev/null 2>&1 &
+kubectl port-forward -n kube-prometheus svc/kube-prometheus-stack-alertmanager 8083:9093 > /dev/null 2>&1 &
 ```
 
 URLs will automatically appear in the **PORTS Tab** in VSCode and can be opened directly in the browser.

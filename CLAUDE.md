@@ -75,7 +75,6 @@ ArgoCD manages its own configuration via GitOps:
 | Directory | Purpose |
 |-----------|---------|
 | `argocd/` | ArgoCD Application definitions (what to deploy) |
-| `argocd/disabled/` | Deactivated ArgoCD Applications (not synced) |
 | `apps/<name>/` | Kubernetes manifests / Helm values for each application |
 | `infrastructure/argocd/` | ArgoCD's own Kustomize overlay |
 | `infrastructure/kind/` | kind cluster config and Traefik Helm values |
@@ -89,10 +88,7 @@ Upstream manifests are never modified directly. Use Kustomize overlays in `infra
 |-----------|------------|
 | `argocd` | ArgoCD |
 | `kube-prometheus` | kube-prometheus-stack (Prometheus, Grafana, Alertmanager) |
-| `logging` | Elasticsearch, Kibana |
-| `tracing` | Jaeger |
 | `traefik` | Traefik ingress controller (kind only, installed via Helm) |
-| `nginx` | Demo application |
 
 ## Adding/Updating Applications
 
@@ -105,7 +101,3 @@ Upstream manifests are never modified directly. Use Kustomize overlays in `infra
 - Grafana: http://grafana-stack.localhost (admin/admin)
 - Prometheus: http://prometheus-stack.localhost
 - Alertmanager: http://alertmanager.localhost
-- Elasticsearch: http://elasticsearch.localhost
-- Kibana: http://kibana.localhost
-- Jaeger: http://jaeger.localhost
-- Nginx: http://nginx.localhost

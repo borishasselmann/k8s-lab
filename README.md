@@ -8,7 +8,7 @@ This lab provides hands-on experience with:
 
 - **GitOps Workflows** - Declarative configuration management with ArgoCD
 - **Kubernetes Core Concepts** - Deployments, Services, Ingress, ConfigMaps
-- **Observability Stack** - Full monitoring, logging, and tracing setup
+- **Observability Stack** - Monitoring with Prometheus, Grafana, and Alertmanager
 - **Infrastructure as Code** - Kustomize overlays and patching strategies
 - **Continuous Delivery** - Automated sync with self-healing capabilities
 - **Real-World Patterns** - App-of-Apps, self-management, and best practices
@@ -55,10 +55,6 @@ Kubeconfig is written to `~/.kube/config-kind-dev`. Traefik is installed via Hel
 - Grafana: <http://grafana-stack.localhost> (admin / admin)
 - Prometheus: <http://prometheus-stack.localhost>
 - Alertmanager: <http://alertmanager.localhost>
-- Elasticsearch: <http://elasticsearch.localhost>
-- Kibana: <http://kibana.localhost>
-- Jaeger: <http://jaeger.localhost>
-- Nginx Demo: <http://nginx.localhost>
 
 ### GitHub Codespaces
 
@@ -70,11 +66,7 @@ For running this lab in GitHub Codespaces, see [CODESPACES_SETUP.md](CODESPACES_
 | --------------------- | ---------------------------------------------- | --------------- |
 | ArgoCD                | GitOps continuous delivery                     | argocd          |
 | kube-prometheus-stack | Prometheus, Grafana, Alertmanager (Helm)       | kube-prometheus |
-| Elasticsearch         | Search & analytics engine, log storage (Helm)  | logging         |
-| Kibana                | Log visualization (bundled with Elasticsearch) | logging         |
-| Jaeger                | Distributed tracing (Helm)                     | tracing         |
 | Traefik               | Ingress controller (kind only, via Helm)       | traefik         |
-| Nginx                 | Demo application                               | nginx           |
 
 ### Grafana Dashboards
 
@@ -99,19 +91,17 @@ Pre-configured dashboards from [kube-prometheus-stack](https://github.com/promet
 │  argocd/                    │  infrastructure/argocd/       │
 │  ├── apps.yaml (App of Apps)│  ├── kustomization.yaml       │
 │  ├── argocd-app.yaml        │  └── ingress.yaml             │
-│  ├── nginx-app.yaml         │                               │
-│  └── kube-prometheus-...    │  apps/nginx/                  │
-│                             │  ├── deployment.yaml          │
-│  apps/kube-prometheus-stack/│  ├── service.yaml             │
-│  └── values.yaml (Helm)     │  └── ingress.yaml             │
+│  └── kube-prometheus-...    │                               │
+│                             │  apps/kube-prometheus-stack/  │
+│                             │  └── values.yaml (Helm)       │
 ├─────────────────────────────────────────────────────────────┤
 │                     ArgoCD (Self-Managed)                   │
 │          Syncs all applications from Git automatically      │
 ├─────────────────────────────────────────────────────────────┤
 │                  Kubernetes Cluster (k3d/kind)              │
-│  ┌──────────┐ ┌───────────────┐ ┌─────────┐ ┌───────────┐   │
-│  │ argocd   │ │kube-prometheus│ │ logging │ │  tracing  │   │
-│  └──────────┘ └───────────────┘ └─────────┘ └───────────┘   │
+│  ┌──────────┐ ┌───────────────┐                              │
+│  │ argocd   │ │kube-prometheus│                              │
+│  └──────────┘ └───────────────┘                              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -177,11 +167,7 @@ patches:
 ├── argocd/                          # ArgoCD Application definitions
 │   ├── apps.yaml                    # App of Apps (root application)
 │   ├── argocd-app.yaml              # ArgoCD self-management
-│   ├── nginx-app.yaml               # Demo application
-│   ├── kube-prometheus-stack-app.yaml # Monitoring stack (Helm)
-│   ├── elasticsearch-app.yaml       # Log storage (Helm)
-│   ├── jaeger-app.yaml              # Distributed tracing (Helm)
-│   └── disabled/                    # Deactivated applications
+│   └── kube-prometheus-stack-app.yaml # Monitoring stack (Helm)
 ├── infrastructure/                  # Infrastructure components
 │   ├── argocd/
 │   │   ├── kustomization.yaml       # Kustomize overlay
@@ -191,10 +177,7 @@ patches:
 │       ├── cluster-config-codespaces.yaml
 │       └── traefik-values.yaml      # Traefik Helm values
 ├── apps/                            # Application manifests & Helm values
-│   ├── nginx/                       # Kubernetes manifests
-│   ├── kube-prometheus-stack/       # Helm values
-│   ├── elasticsearch/               # Helm values (includes Kibana)
-│   └── jaeger/                      # Helm values
+│   └── kube-prometheus-stack/       # Helm values
 └── templates/                       # Scaffolding templates for new applications
     ├── create-app.sh                # App creation script
     └── README.md                    # Template documentation
