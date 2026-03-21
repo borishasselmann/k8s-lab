@@ -62,26 +62,26 @@ Git Push → ArgoCD detects changes → Syncs to Kubernetes cluster
 ```
 
 ### App-of-Apps Pattern
-- [argocd/apps.yaml](argocd/apps.yaml) is the root application that manages all other ArgoCD Applications
-- Individual apps are defined in `argocd/<app-name>-app.yaml`
+- [bootstrap/app-of-apps.yaml](bootstrap/app-of-apps.yaml) is the root application that manages all other ArgoCD Applications
+- [apps/kustomization.yaml](apps/kustomization.yaml) is the master-switch that controls which apps are active
+- Each app has its own directory under `apps/` with an `application.yaml` and related files
 - Apps automatically sync with self-healing and pruning enabled
 
 ### ArgoCD Self-Management
 ArgoCD manages its own configuration via GitOps:
-- [argocd/argocd-app.yaml](argocd/argocd-app.yaml) points to [infrastructure/argocd/](infrastructure/argocd/)
+- [apps/argocd/application.yaml](apps/argocd/application.yaml) points to [apps/argocd/](apps/argocd/)
 - Never modify ArgoCD directly with kubectl - change Git instead
 
 ### Directory Structure
 | Directory | Purpose |
 |-----------|---------|
-| `argocd/` | ArgoCD Application definitions (what to deploy) |
-| `apps/<name>/` | Kubernetes manifests / Helm values for each application |
-| `infrastructure/argocd/` | ArgoCD's own Kustomize overlay |
+| `bootstrap/` | App-of-Apps root application (initial cluster setup) |
+| `apps/<name>/` | ArgoCD Application definitions + manifests / Helm values |
 | `infrastructure/kind/` | kind cluster config and Traefik Helm values |
 | `templates/` | Scaffolding templates for new applications |
 
 ### Kustomize Patching
-Upstream manifests are never modified directly. Use Kustomize overlays in `infrastructure/` to patch them. Example in [infrastructure/argocd/kustomization.yaml](infrastructure/argocd/kustomization.yaml).
+Upstream manifests are never modified directly. Use Kustomize overlays to patch them. Example in [apps/argocd/kustomization.yaml](apps/argocd/kustomization.yaml).
 
 ## Namespaces
 | Namespace | Components |
@@ -92,9 +92,9 @@ Upstream manifests are never modified directly. Use Kustomize overlays in `infra
 
 ## Adding/Updating Applications
 
-1. **New app**: Use `./templates/create-app.sh` or manually create manifests in `apps/` and ArgoCD definition in `argocd/`
+1. **New app**: Use `./templates/create-app.sh` or manually create `apps/<name>/application.yaml`, then add it to `apps/kustomization.yaml`
 2. **Update app**: Modify manifests in `apps/<name>/`, commit and push
-3. **Helm apps**: Use ArgoCD multi-source pattern with values files in the repo (see [argocd/kube-prometheus-stack-app.yaml](argocd/kube-prometheus-stack-app.yaml))
+3. **Helm apps**: Use ArgoCD multi-source pattern with values files in the repo (see [apps/kube-prometheus-stack/application.yaml](apps/kube-prometheus-stack/application.yaml))
 
 ## Local Access URLs
 - ArgoCD: http://argocd.localhost

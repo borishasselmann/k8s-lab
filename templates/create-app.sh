@@ -101,8 +101,8 @@ if [[ -d "$ROOT_DIR/apps/$APP_NAME" ]]; then
     exit 1
 fi
 
-if [[ -f "$ROOT_DIR/argocd/$APP_NAME-app.yaml" ]]; then
-    echo -e "${RED}Error: ArgoCD application '$APP_NAME-app.yaml' already exists${NC}"
+if [[ -f "$ROOT_DIR/apps/$APP_NAME/application.yaml" ]]; then
+    echo -e "${RED}Error: ArgoCD application '$APP_NAME/application.yaml' already exists${NC}"
     exit 1
 fi
 
@@ -119,7 +119,7 @@ mkdir -p "$ROOT_DIR/apps/$APP_NAME"
 
 # Copy template files
 cp "$SCRIPT_DIR/apps/APP_NAME/app.yaml" "$ROOT_DIR/apps/$APP_NAME/app.yaml"
-cp "$SCRIPT_DIR/argocd/APP_NAME-app.yaml" "$ROOT_DIR/argocd/$APP_NAME-app.yaml"
+cp "$SCRIPT_DIR/apps/APP_NAME/application.yaml" "$ROOT_DIR/apps/$APP_NAME/application.yaml"
 
 if [[ "$NO_INGRESS" = false ]]; then
     cp "$SCRIPT_DIR/apps/APP_NAME/ingress.yaml" "$ROOT_DIR/apps/$APP_NAME/ingress.yaml"
@@ -149,7 +149,7 @@ replace_placeholders() {
     fi
 }
 
-for file in "$ROOT_DIR/apps/$APP_NAME"/*.yaml "$ROOT_DIR/argocd/$APP_NAME-app.yaml"; do
+for file in "$ROOT_DIR/apps/$APP_NAME"/*.yaml; do
     if [[ -f "$file" ]]; then
         replace_placeholders "$file"
     fi
@@ -159,7 +159,6 @@ echo ""
 echo -e "${GREEN}Application '$APP_NAME' created successfully!${NC}"
 echo ""
 echo "Files created:"
-echo "  - argocd/$APP_NAME-app.yaml"
 ls -1 "$ROOT_DIR/apps/$APP_NAME" | sed "s/^/  - apps\/$APP_NAME\//"
 echo ""
 echo "Optional files (copy from templates/apps/APP_NAME/ if needed):"
@@ -169,7 +168,9 @@ echo ""
 echo "Next steps:"
 echo "  1. Review apps/$APP_NAME/app.yaml"
 echo "  2. Adjust health probes if needed (/health endpoint)"
-echo "  3. Commit and push:"
+echo "  3. Add to apps/kustomization.yaml:"
+echo "     - $APP_NAME/application.yaml"
+echo "  4. Commit and push:"
 echo "     git add . && git commit -m \"Add $APP_NAME application\" && git push"
 echo ""
 if [[ "$NO_INGRESS" = false ]]; then

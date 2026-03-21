@@ -23,14 +23,14 @@ export KUBECONFIG="${KUBECONFIG_FILE}"
 
 # Install ArgoCD with Kustomize (includes --insecure patch and ingress)
 kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
-kubectl apply -k infrastructure/argocd/ --server-side
+kubectl apply -k apps/argocd/ --server-side
 
 # Wait for deployment to be ready
 echo "Waiting for ArgoCD deployment..."
 kubectl rollout status deployment/argocd-server -n argocd --timeout=300s
 
 # Apply apps
-kubectl apply -f argocd/apps.yaml
+kubectl apply -f bootstrap/app-of-apps.yaml
 
 # Wait for admin secret to be generated
 echo "Waiting for admin secret..."

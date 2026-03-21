@@ -35,10 +35,9 @@ Options:
 templates/
 ├── README.md
 ├── create-app.sh           # App creation script
-├── argocd/
-│   └── APP_NAME-app.yaml   # ArgoCD Application
 └── apps/
     └── APP_NAME/
+        ├── application.yaml # ArgoCD Application definition
         ├── app.yaml        # ServiceAccount + Deployment + Service (core)
         ├── ingress.yaml    # Ingress (optional, created by default)
         ├── policies.yaml   # NetworkPolicy + PDB (optional)
@@ -49,8 +48,15 @@ Generated app structure:
 
 ```text
 apps/myapp/
+├── application.yaml        # ArgoCD Application definition
 ├── app.yaml                # ServiceAccount + Deployment + Service
 └── ingress.yaml            # Ingress (if --no-ingress not set)
+```
+
+**Note:** After creating an app, add it to `apps/kustomization.yaml`:
+
+```yaml
+- myapp/application.yaml
 ```
 
 ## Placeholders

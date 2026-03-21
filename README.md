@@ -88,12 +88,15 @@ Pre-configured dashboards from [kube-prometheus-stack](https://github.com/promet
 ┌─────────────────────────────────────────────────────────────┐
 │                        Git Repository                       │
 ├─────────────────────────────────────────────────────────────┤
-│  argocd/                    │  infrastructure/argocd/       │
-│  ├── apps.yaml (App of Apps)│  ├── kustomization.yaml       │
-│  ├── argocd-app.yaml        │  └── ingress.yaml             │
-│  └── kube-prometheus-...    │                               │
-│                             │  apps/kube-prometheus-stack/  │
-│                             │  └── values.yaml (Helm)       │
+│  bootstrap/                 │  apps/                        │
+│  └── app-of-apps.yaml       │  ├── kustomization.yaml       │
+│      (root application)     │  ├── argocd/                  │
+│                             │  │   ├── application.yaml     │
+│                             │  │   ├── kustomization.yaml   │
+│                             │  │   └── ingress.yaml         │
+│                             │  └── kube-prometheus-stack/   │
+│                             │      ├── application.yaml     │
+│                             │      └── values.yaml          │
 ├─────────────────────────────────────────────────────────────┤
 │                     ArgoCD (Self-Managed)                   │
 │          Syncs all applications from Git automatically      │
@@ -109,17 +112,15 @@ Pre-configured dashboards from [kube-prometheus-stack](https://github.com/promet
 
 ### App of Apps Pattern
 
-A single ArgoCD Application (`apps.yaml`) manages all other Applications:
+A root ArgoCD Application (`bootstrap/app-of-apps.yaml`) manages all other Applications. The `apps/kustomization.yaml` acts as a master-switch:
 
 ```yaml
-# argocd/apps.yaml - deploys all apps in argocd/ directory
-spec:
-  source:
-    path: argocd
-  syncPolicy:
-    automated:
-      selfHeal: true   # Auto-fix drift
-      prune: true      # Remove deleted resources
+# apps/kustomization.yaml - controls which apps are active
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - argocd/application.yaml
+  - kube-prometheus-stack/application.yaml
 ```
 
 ### ArgoCD Self-Management
@@ -127,10 +128,10 @@ spec:
 ArgoCD manages itself via GitOps. Changes to ArgoCD configuration are made in Git, not via kubectl:
 
 ```yaml
-# argocd/argocd-app.yaml
+# apps/argocd/application.yaml
 spec:
   source:
-    path: infrastructure/argocd  # Points to Kustomize overlay
+    path: apps/argocd  # Points to Kustomize overlay
 ```
 
 ### Kustomize for Patching
@@ -138,7 +139,7 @@ spec:
 Instead of modifying upstream manifests, use Kustomize overlays:
 
 ```yaml
-# infrastructure/argocd/kustomization.yaml
+# apps/argocd/kustomization.yaml
 resources:
   - https://raw.githubusercontent.com/.../install.yaml  # Upstream
   - ingress.yaml                                         # Local additions
@@ -164,20 +165,22 @@ patches:
 .
 ├── bootstrap.sh                     # Cluster setup with k3d
 ├── bootstrap-kind.sh                # Cluster setup with kind
-├── argocd/                          # ArgoCD Application definitions
-│   ├── apps.yaml                    # App of Apps (root application)
-│   ├── argocd-app.yaml              # ArgoCD self-management
-│   └── kube-prometheus-stack-app.yaml # Monitoring stack (Helm)
-├── infrastructure/                  # Infrastructure components
-│   ├── argocd/
+├── bootstrap/                       # Initial cluster bootstrap
+│   └── app-of-apps.yaml            # Root ArgoCD Application
+├── apps/                            # All applications (App-of-Apps pattern)
+│   ├── kustomization.yaml           # Master-switch (active apps)
+│   ├── argocd/                      # ArgoCD self-management
+│   │   ├── application.yaml         # ArgoCD Application definition
 │   │   ├── kustomization.yaml       # Kustomize overlay
 │   │   └── ingress.yaml             # ArgoCD ingress
+│   └── kube-prometheus-stack/       # Monitoring stack (Helm)
+│       ├── application.yaml         # ArgoCD Application definition
+│       └── values.yaml              # Helm values
+├── infrastructure/                  # Cluster configuration
 │   └── kind/                        # kind cluster configuration
 │       ├── cluster-config.yaml      # Port mappings + node labels
 │       ├── cluster-config-codespaces.yaml
 │       └── traefik-values.yaml      # Traefik Helm values
-├── apps/                            # Application manifests & Helm values
-│   └── kube-prometheus-stack/       # Helm values
 └── templates/                       # Scaffolding templates for new applications
     ├── create-app.sh                # App creation script
     └── README.md                    # Template documentation
@@ -222,7 +225,7 @@ spec:
 
 ```bash
 set -e                              # Exit on error
-kubectl apply -k infrastructure/    # Declarative with Kustomize
+kubectl apply -k apps/argocd/      # Declarative with Kustomize
 kubectl rollout status deployment/  # Wait for ready state
 ```
 
@@ -230,14 +233,14 @@ kubectl rollout status deployment/  # Wait for ready state
 
 ### Adding a New Application
 
-1. Create manifests in `apps/<app-name>/`
-2. Create ArgoCD Application in `argocd/<app-name>-app.yaml`
-3. Push to Git
-4. ArgoCD auto-syncs (via App of Apps)
+1. Create `apps/<app-name>/application.yaml` (ArgoCD Application definition)
+2. Add manifests or Helm values in the same directory
+3. Add entry to `apps/kustomization.yaml`
+4. Push to Git — ArgoCD auto-syncs
 
 ### Updating ArgoCD Configuration
 
-1. Modify `infrastructure/argocd/kustomization.yaml`
+1. Modify `apps/argocd/kustomization.yaml`
 2. Push to Git
 3. ArgoCD self-heals to new state
 
