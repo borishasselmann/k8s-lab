@@ -1,6 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
+# Auto-detect kubeconfig
+for f in ~/.kube/config-kind-dev ~/.kube/config-k3d-dev; do
+  if [[ -f "$f" ]]; then
+    export KUBECONFIG="$f"
+    break
+  fi
+done
+
 # Kill any existing port-forwards
 pkill -f "kubectl port-forward" 2>/dev/null || true
 sleep 1
