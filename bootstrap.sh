@@ -38,8 +38,29 @@ until kubectl -n argocd get secret argocd-initial-admin-secret &>/dev/null; do
   sleep 2
 done
 
-echo ""
-echo "Done! ArgoCD: http://argocd.localhost"
-echo "Password: $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d)"
+ARGOCD_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d)
+
 echo ""
 echo "Kubeconfig: ${KUBECONFIG_FILE}"
+
+if [[ "$1" == "--codespaces" ]]; then
+  # In Codespaces *.localhost does not work, start port-forwards in background
+  echo "Starting port-forwards for Codespaces..."
+  kubectl port-forward svc/argocd-server -n argocd 8080:80 &>/dev/null &
+  kubectl port-forward svc/kube-prometheus-stack-grafana -n kube-prometheus 8081:80 &>/dev/null &
+  kubectl port-forward svc/kube-prometheus-stack-prometheus -n kube-prometheus 8082:9090 &>/dev/null &
+  kubectl port-forward svc/kube-prometheus-stack-alertmanager -n kube-prometheus 8083:9093 &>/dev/null &
+  echo ""
+  echo "Done! Open via Ports tab:"
+  echo "  ArgoCD:       port 8080  (admin / ${ARGOCD_PASSWORD})"
+  echo "  Grafana:      port 8081  (admin / admin)"
+  echo "  Prometheus:   port 8082"
+  echo "  Alertmanager: port 8083"
+else
+  echo ""
+  echo "Done!"
+  echo "  ArgoCD:       http://argocd.localhost         (admin / ${ARGOCD_PASSWORD})"
+  echo "  Grafana:      http://grafana-stack.localhost   (admin / admin)"
+  echo "  Prometheus:   http://prometheus-stack.localhost"
+  echo "  Alertmanager: http://alertmanager.localhost"
+fi

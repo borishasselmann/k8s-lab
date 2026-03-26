@@ -15,15 +15,23 @@
   },
   "onCreateCommand": ".devcontainer/on-create.sh",
   "postCreateCommand": ".devcontainer/post-create.sh",
-  "forwardPorts": [80, 443],
+  "forwardPorts": [8080, 8081, 8082, 8083],
   "portsAttributes": {
-    "80": {
-      "label": "Ingress HTTP",
+    "8080": {
+      "label": "ArgoCD",
       "onAutoForward": "notify"
     },
-    "443": {
-      "label": "Ingress HTTPS",
-      "onAutoForward": "ignore"
+    "8081": {
+      "label": "Grafana",
+      "onAutoForward": "silent"
+    },
+    "8082": {
+      "label": "Prometheus",
+      "onAutoForward": "silent"
+    },
+    "8083": {
+      "label": "Alertmanager",
+      "onAutoForward": "silent"
     }
   },
   "customizations": {
