@@ -1,24 +1,49 @@
 {
   "name": "k8s-lab",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "remoteUser": "vscode",
   "hostRequirements": {
-    "cpus": 8,
-    "memory": "32gb"
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
   },
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
       "minikube": "none"
+    },
+    "ghcr.io/devcontainers-extra/features/kustomize:1": {
+      "version": "5.8.1"
+    },
+    "ghcr.io/devcontainers-extra/features/k9s:1": {
+      "version": "0.50.18"
     }
   },
   "postCreateCommand": ".devcontainer/post-create.sh",
+  "forwardPorts": [80, 443],
+  "portsAttributes": {
+    "80": {
+      "label": "Ingress HTTP",
+      "onAutoForward": "notify"
+    },
+    "443": {
+      "label": "Ingress HTTPS",
+      "onAutoForward": "ignore"
+    }
+  },
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-kubernetes-tools.vscode-kubernetes-tools",
         "redhat.vscode-yaml",
-        "ms-azuretools.vscode-docker"
-      ]
+        "ms-azuretools.vscode-docker",
+        "eamodio.gitlens"
+      ],
+      "settings": {
+        "yaml.schemas": {
+          "kubernetes": "apps/**/*.yaml"
+        }
+      }
     }
   }
 }
