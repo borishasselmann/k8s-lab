@@ -2,34 +2,58 @@
 
 A production-ready GitOps-based Kubernetes learning environment using ArgoCD and Kustomize.
 
+## TL;DR
+
+### GitHub Codespaces (zero setup)
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/borishasselmann/k8s-lab)
+
+```bash
+./bootstrap-kind.sh --codespaces   # start cluster + ArgoCD
+./port-forward.sh                  # re-run after ArgoCD syncs apps
+```
+
+Services are available via the **Ports** tab (8080=ArgoCD, 8081=Grafana, 8082=Prometheus, 8083=Alertmanager).
+
+### Local (macOS / Linux)
+
+```bash
+./bootstrap-kind.sh   # or ./bootstrap.sh for k3d
+```
+
+Open <http://argocd.localhost> — credentials are shown in the terminal output.
+
 ## What You'll Learn
 
 This lab provides hands-on experience with:
 
-- **GitOps Workflows** - Declarative configuration management with ArgoCD
-- **Kubernetes Core Concepts** - Deployments, Services, Ingress, ConfigMaps
-- **Observability Stack** - Monitoring with Prometheus, Grafana, and Alertmanager
-- **Infrastructure as Code** - Kustomize overlays and patching strategies
-- **Continuous Delivery** - Automated sync with self-healing capabilities
-- **Real-World Patterns** - App-of-Apps, self-management, and best practices
+- **GitOps Workflows** — Declarative configuration management with ArgoCD
+- **Kubernetes Core Concepts** — Deployments, Services, Ingress, ConfigMaps
+- **Observability Stack** — Monitoring with Prometheus, Grafana, and Alertmanager
+- **Infrastructure as Code** — Kustomize overlays and patching strategies
+- **Continuous Delivery** — Automated sync with self-healing capabilities
+- **Real-World Patterns** — App-of-Apps, self-management, and best practices
 
 All components mirror production setups, making this an ideal environment for learning Kubernetes operations.
 
 ## Prerequisites
 
-| Tool | Required |
-|------|----------|
-| Docker | Yes |
-| k3d or kind | Yes (one of them) |
-| kubectl | Yes |
-| helm | Only for kind bootstrap |
+### Local Development
 
-**Platform Support:**
-- macOS: Full support
-- Linux: Full support
-- Windows: Requires WSL2
+| Tool        | Required                |
+| ----------- | ----------------------- |
+| Docker      | Yes                     |
+| k3d or kind | Yes (one of them)       |
+| kubectl     | Yes                     |
+| helm        | Only for kind bootstrap |
+
+**Platform Support:** macOS, Linux (full support), Windows (requires WSL2).
 
 **Note:** Port 80 must be available (no other webserver running).
+
+### GitHub Codespaces
+
+No local prerequisites needed — everything is pre-installed in the devcontainer.
 
 ## Quick Start
 
@@ -56,35 +80,52 @@ Kubeconfig is written to `~/.kube/config-kind-dev`. Traefik is installed via Hel
 - Prometheus: <http://prometheus-stack.localhost>
 - Alertmanager: <http://alertmanager.localhost>
 
-### GitHub Codespaces
+### GitHub Codespaces Setup
 
-For running this lab in GitHub Codespaces, see [CODESPACES_SETUP.md](CODESPACES_SETUP.md).
+```bash
+./bootstrap-kind.sh --codespaces
+```
+
+Wait for ArgoCD to sync all apps (~2-3 min), then start port-forwards:
+
+```bash
+./port-forward.sh
+```
+
+| Port | Service      | Credentials                 |
+| ---- | ------------ | --------------------------- |
+| 8080 | ArgoCD       | admin / (shown in terminal) |
+| 8081 | Grafana      | admin / admin               |
+| 8082 | Prometheus   | —                           |
+| 8083 | Alertmanager | —                           |
+
+Open services via the **Ports** tab in VS Code. Re-run `./port-forward.sh` anytime to restart all forwards.
 
 ## Components
 
-| Component             | Purpose                                        | Namespace       |
-| --------------------- | ---------------------------------------------- | --------------- |
-| ArgoCD                | GitOps continuous delivery                     | argocd          |
-| kube-prometheus-stack | Prometheus, Grafana, Alertmanager (Helm)       | kube-prometheus |
-| Traefik               | Ingress controller (kind only, via Helm)       | traefik         |
+| Component              | Purpose                                  | Namespace        |
+| ---------------------- | ---------------------------------------- | ---------------- |
+| ArgoCD                 | GitOps continuous delivery               | argocd           |
+| kube-prometheus-stack  | Prometheus, Grafana, Alertmanager (Helm) | kube-prometheus  |
+| Traefik                | Ingress controller (kind only, via Helm) | traefik          |
 
 ### Grafana Dashboards
 
 Pre-configured dashboards from [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack):
 
-| Dashboard                       | Description                              |
-| ------------------------------- | ---------------------------------------- |
-| Kubernetes / Cluster            | Cluster-wide resource overview           |
-| Kubernetes / Kubelet            | Kubelet operations, pod starts, PLEG     |
-| Kubernetes / Nodes              | Node CPU, memory, disk, network          |
-| Kubernetes / Networking / Pod   | Per-pod network bandwidth and packets    |
-| Kubernetes / Persistent Volumes | PVC space and inode usage                |
-| Prometheus / Overview           | Prometheus self-monitoring               |
-| K8s Node Metrics                | Detailed node-exporter metrics           |
+| Dashboard                       | Description                           |
+| ------------------------------- | ------------------------------------- |
+| Kubernetes / Cluster            | Cluster-wide resource overview        |
+| Kubernetes / Kubelet            | Kubelet operations, pod starts, PLEG  |
+| Kubernetes / Nodes              | Node CPU, memory, disk, network       |
+| Kubernetes / Networking / Pod   | Per-pod network bandwidth and packets |
+| Kubernetes / Persistent Volumes | PVC space and inode usage             |
+| Prometheus / Overview           | Prometheus self-monitoring            |
+| K8s Node Metrics                | Detailed node-exporter metrics        |
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                        Git Repository                       │
 ├─────────────────────────────────────────────────────────────┤
@@ -102,9 +143,9 @@ Pre-configured dashboards from [kube-prometheus-stack](https://github.com/promet
 │          Syncs all applications from Git automatically      │
 ├─────────────────────────────────────────────────────────────┤
 │                  Kubernetes Cluster (k3d/kind)              │
-│  ┌──────────┐ ┌───────────────┐                              │
-│  │ argocd   │ │kube-prometheus│                              │
-│  └──────────┘ └───────────────┘                              │
+│  ┌──────────┐ ┌───────────────┐                             │
+│  │ argocd   │ │kube-prometheus│                             │
+│  └──────────┘ └───────────────┘                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -155,16 +196,18 @@ patches:
 ```
 
 **Benefits:**
+
 - Upstream stays untouched (easy updates)
 - Patches are declarative and version-controlled
 - No imperative `kubectl patch` commands
 
 ## Directory Structure
 
-```
+```text
 .
 ├── bootstrap.sh                     # Cluster setup with k3d
 ├── bootstrap-kind.sh                # Cluster setup with kind
+├── port-forward.sh                  # Port-forwards for Codespaces
 ├── bootstrap/                       # Initial cluster bootstrap
 │   └── app-of-apps.yaml            # Root ArgoCD Application
 ├── apps/                            # All applications (App-of-Apps pattern)
@@ -181,6 +224,10 @@ patches:
 │       ├── cluster-config.yaml      # Port mappings + node labels
 │       ├── cluster-config-codespaces.yaml
 │       └── traefik-values.yaml      # Traefik Helm values
+├── .devcontainer/                   # GitHub Codespaces / devcontainer setup
+│   ├── devcontainer.json            # Container configuration
+│   ├── on-create.sh                 # Tool installation (cached in prebuilds)
+│   └── post-create.sh              # Repo-specific setup
 └── templates/                       # Scaffolding templates for new applications
     ├── create-app.sh                # App creation script
     └── README.md                    # Template documentation
@@ -270,13 +317,13 @@ rm -f ~/.kube/config-kind-dev
 
 Potential enhancements for this learning environment:
 
-| Feature | Description |
-| ------- | ----------- |
+| Feature                | Description                                                           |
+| ---------------------- | --------------------------------------------------------------------- |
 | **Persistent Storage** | PersistentVolumes for Prometheus/Grafana data (survives pod restarts) |
-| **Loki** | Log aggregation stack for centralized logging |
-| **Network Policies** | Namespace isolation for improved security |
-| **Resource Quotas** | Per-namespace resource limits |
-| **Sealed Secrets** | GitOps-compatible secret management |
+| **Loki**               | Log aggregation stack for centralized logging                         |
+| **Network Policies**   | Namespace isolation for improved security                             |
+| **Resource Quotas**    | Per-namespace resource limits                                         |
+| **Sealed Secrets**     | GitOps-compatible secret management                                   |
 
 ## References
 
